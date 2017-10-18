@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 
 import TodoGroup from '../TodoGroup'
 
-const TodoGroupList = ({ lists, onSelect }) => {
+const TodoGroupList = ({ lists, onSelect, selectedListId }) => {
   return (
     <ul className='list pl0 ml0 center mw6 ba b--light-silver br2'>
       {lists&&lists.length>0
@@ -10,6 +10,7 @@ const TodoGroupList = ({ lists, onSelect }) => {
           <TodoGroup
             key={i}
             {...list}
+            isSelected={selectedListId==list.id}
             onSelect={()=>onSelect(list)}
             isLast={(lists.length - 1) === i}
           />

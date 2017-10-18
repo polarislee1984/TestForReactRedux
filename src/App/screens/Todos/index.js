@@ -22,8 +22,7 @@ const Todos = ({ lists, addList, selectedId, todos, addTodo, toggleTodo, filterT
           addList(list)
           reset()
         }} />
-        <TodoGroupList {...{ lists}} onSelect={(list)=>{
-          console.log('selected list', list)
+        <TodoGroupList {...{ lists, selectedListId}} onSelect={(list)=>{
           selectList(list.id)
         }}/>
       </div>
