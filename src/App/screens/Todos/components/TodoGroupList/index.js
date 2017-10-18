@@ -2,15 +2,16 @@ import React, { PropTypes } from 'react'
 
 import TodoGroup from '../TodoGroup'
 
-const TodoGroupList = ({ groups }) => {
+const TodoGroupList = ({ lists, onSelect }) => {
   return (
     <ul className='list pl0 ml0 center mw6 ba b--light-silver br2'>
-      {groups
-        ? groups.map((group, i) =>
+      {lists&&lists.length>0
+        ? lists.map((list, i) =>
           <TodoGroup
             key={i}
-            {...group}
-            isLast={(groups.length - 1) === i}
+            {...list}
+            onSelect={()=>onSelect(list)}
+            isLast={(lists.length - 1) === i}
           />
         )
         : <p className='ph3 pv3 tc'>No list found</p>
@@ -20,7 +21,7 @@ const TodoGroupList = ({ groups }) => {
 }
 
 TodoGroupList.propTypes = {
-  groups: PropTypes.array
+  lists: PropTypes.array
 }
 
 export default TodoGroupList

@@ -17,7 +17,7 @@ export function* receiveResponse (response) {
   if (response.ok) {
     const todo = normalize(response.data.todo, schema.todo)
 
-    yield put(actions.setEntity(todo, {type: 'todos'}))
+    yield put(actions.setEntity(todo, {type: 'todos', parentType:'lists', parentId:todo.listID}))
   } else {
     const error = response.data.error
 
@@ -30,8 +30,7 @@ export function* addTodo () {
     const action = yield take(t.SUBMIT_ENTITY)
     if (action.meta && action.meta.type === 'todos') {
       const todo = {
-        ...action.payload,
-        listID: 1 // Change this to support multiple lists
+        ...action.payload
       }
 
       const response = yield call(api.post, '/todos', {...todo})
@@ -42,11 +41,25 @@ export function* addTodo () {
 }
 
 export function* toggleTodo () {
+  console.log("Called toggleTodo")
   while (true) {
     const action = yield take(t.UPDATE_ENTITY)
     if (action.meta && action.meta.type === 'todos') {
       const todo = action.payload
       const response = yield call(api.put, `/todos/${todo.id}`, {...todo})
+
+      yield fork(receiveResponse, response)
+    }
+  }
+}
+
+export function* filterTodo () {
+  while (true) {
+    const action = yield take(t.FETCH_ENTITIES)
+    if (action.meta && action.meta.type === 'todos') {
+      const status = action.payload
+      console.log('status', status)
+      const response = yield call(api.get, `/todos?status=` + status, {})
 
       yield fork(receiveResponse, response)
     }

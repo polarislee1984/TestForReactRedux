@@ -13,6 +13,7 @@ import byId, * as fromById from './byId'
 import idsList, * as fromIdsList from './idsList'
 import status, * as fromStatus from './status'
 import filter from './filter'
+import selectedId from './selectedId'
 import pagination, * as fromPagination from './pagination'
 
 export default (type) => combineReducers({
@@ -20,7 +21,8 @@ export default (type) => combineReducers({
   idsList: idsList(type),
   status: status(type),
   filter: filter(type),
-  pagination: pagination(type)
+  pagination: pagination(type),
+  selectedId:selectedId(type),
 })
 
 // Get one item in a state of this reducer
@@ -34,29 +36,45 @@ export const getEntities = (type) => createSelector(
   state => state,
   state => fromIdsList.getIds(state[type].idsList),
   state => (state[type].filter?state[type].filter.filter:''),
-  (state, entitiesIds, filter) => {
+  state => (state[type].selectedId?state[type].selectedId.selectedId:null),
+  (state, entitiesIds, filter, selectedId) => {
     if (entitiesIds) {
-      var entities =  entitiesIds.map(id => fromById.getEntity(state[type].byId, id))
-      console.log('filter', filter, entities)
-      if(filter) {
-        entities = entities.filter(entity => (entity.completed==(filter=='completed')))
-      }
+      if(type == 'todos') {
+        var entities =  entitiesIds.map(id => fromById.getEntity(state[type].byId, id))
+        //console.log('filter', filter, entities)
+        if(filter) {
+          entities = entities.filter(entity => (entity.completed==(filter=='completed')))
+        }
 
-      return entities;
+        return entities;
+      } else {
+        var entities =  entitiesIds.map(id => fromById.getEntity(state[type].byId, id))
+        return entities;
+      }
     }
   }
 )
 
 // Get child entities by its parent ID
-export const getChildEntities = (childType, parentType, parentId) => createSelector(
-  state => state,
-  state => fromById.getEntity(state[parentType].byId, parentId),
-  (state, parent) => {
-    if (parent && parent[childType]) {
-      return parent[childType].map(id => fromById.getEntity(state[childType].byId, id))
+export const getChildEntities = (childType, parentType, parentId) => {
+  console.log("getChildEntities", childType, parentType, parentId)
+  return createSelector(
+    state => state,
+    state => fromById.getEntity(state[parentType].byId, parentId),
+    state => fromIdsList.getIds(state[childType].idsList),
+    state => (state[childType].filter?state[childType].filter.filter:''),
+    (state, parent, entitiesIds, filter) => {
+      if (parent) {
+        var entities =  entitiesIds.map(id => fromById.getEntity(state[childType].byId, id))
+        entities = entities.filter(entity => (entity.listID==parentId))
+        if(filter) {
+          entities = entities.filter(entity => (entity.completed==(filter=='completed')))
+        }
+        return entities
+      }
     }
-  }
-)
+  )
+}
 
 export const isLoading = (state, type) => fromStatus.isLoading(state[type].status)
 

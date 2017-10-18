@@ -41,7 +41,7 @@ export default (type) => createReducer({
   }) => {
     // 'result' can be a child looking for his parent,
     // so start checking for that
-    if (!isNil(parentType) && parentType === type && !isNil(parentId)) {
+    if (!isNil(parentType) && !isNil(parentId)) {
       const parent = {...state[parentId]}
       const child = Array.isArray(result) ? result : [result]
       parent[rtype] = parent[rtype] ? parent[rtype] : []

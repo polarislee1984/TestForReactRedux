@@ -18,7 +18,7 @@ const api = {
     const id = path.split('/')[2]
     const status = getParameterByName('status', path)
 
-    console.error('called get api', id, status)
+    console.err('called get api', id, status)
     let data
     if (typeof id === 'undefined') {
       if (path.match(/lists/g)) {
@@ -109,7 +109,6 @@ const api = {
 
   put: (path, data) => {
     const id = path.split('/')[2]
-    console.log('-------------------- PUT ---------------', id)
 
     let todo = fakeDB.todos.find(i => i.id === id)
 
